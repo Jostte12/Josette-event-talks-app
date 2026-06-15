@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="View Google BigQuery Release Notes, filter by update type, and share updates on Twitter.">
+    <title>BigQuery Release Notes Dashboard</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar or Header -->
+        <header class="app-header">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-database animate-pulse"></i>
+                </div>
+                <div>
+                    <h1>BigQuery Releases</h1>
+                    <p class="subtitle">Live tracking & social sharing dashboard</p>
+                </div>
+            </div>
+            
+            <div class="action-controls">
+                <button id="refresh-btn" class="btn btn-primary" title="Refresh Release Notes">
+                    <i id="spinner" class="fa-solid fa-rotate"></i>
+                    <span>Refresh</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Layout -->
+        <main class="app-content">
+            <!-- Filter & Search Bar -->
+            <div class="filter-section card">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="search-input" placeholder="Search releases (e.g. Gemini, ObjectRef, ML)...">
+                </div>
+                
+                <div class="filter-tags">
+                    <button class="filter-tag active" data-type="all">All</button>
+                    <button class="filter-tag" data-type="Feature">Features</button>
+                    <button class="filter-tag" data-type="Deprecated">Deprecated</button>
+                    <button class="filter-tag" data-type="Changed">Changed</button>
+                    <button class="filter-tag" data-type="Update">General Updates</button>
+                </div>
+            </div>
+
+            <!-- Dashboard Columns -->
+            <div class="dashboard-grid">
+                <!-- Left Column: Releases List -->
+                <section class="releases-column">
+                    <h2 class="section-title">Latest Updates <span id="item-count" class="badge">0</span></h2>
+                    
+                    <!-- Loading / Error States -->
+                    <div id="loading-state" class="state-container">
+                        <div class="loader"></div>
+                        <p>Fetching latest release notes...</p>
+                    </div>
+                    
+                    <div id="error-state" class="state-container hidden">
+                        <i class="fa-solid fa-triangle-exclamation error-icon"></i>
+                        <p id="error-message">Failed to load release notes.</p>
+                        <button id="retry-btn" class="btn btn-secondary">Retry</button>
+                    </div>
+
+                    <div id="empty-state" class="state-container hidden">
+                        <i class="fa-solid fa-folder-open empty-icon"></i>
+                        <p>No release notes match your filters.</p>
+                    </div>
+
+                    <!-- List Container -->
+                    <div id="releases-list" class="releases-list">
+                        <!-- Javascript will inject cards here -->
+                    </div>
+                </section>
+
+                <!-- Right Column: Tweet Composer & Preview (Sticky) -->
+                <section class="composer-column">
+                    <div class="sticky-container">
+                        <div class="social-panel card">
+                            <div class="panel-header">
+                                <h3><i class="fa-brands fa-x-twitter"></i> Tweet Composer</h3>
+                                <span class="badge badge-accent">Share Update</span>
+                            </div>
+                            
+                            <!-- Prompt state (when nothing is selected) -->
+                            <div id="composer-prompt" class="composer-prompt">
+                                <div class="prompt-graphic">
+                                    <i class="fa-solid fa-arrow-pointer animate-float"></i>
+                                </div>
+                                <p>Select any release note on the left to draft and share a tweet instantly!</p>
+                            </div>
+
+                            <!-- Composer Form (hidden by default) -->
+                            <div id="composer-form" class="composer-form hidden">
+                                <div class="selected-details">
+                                    <div class="meta-row">
+                                        <span id="selected-type" class="type-tag tag-feature">Feature</span>
+                                        <span id="selected-date" class="date-text">June 12, 2026</span>
+                                    </div>
+                                    <div id="selected-preview" class="selected-preview">
+                                        <!-- Original text preview -->
+                                    </div>
+                                </div>
+
+                                <div class="tweet-box-container">
+                                    <label for="tweet-textarea" class="field-label">Customize your Tweet</label>
+                                    <textarea id="tweet-textarea" rows="5" maxlength="280"></textarea>
+                                    <div class="tweet-status">
+                                        <div class="char-count">
+                                            <span id="char-current">0</span>/<span id="char-max">280</span>
+                                        </div>
+                                        <div class="progress-ring-container">
+                                            <svg class="progress-ring" width="24" height="24">
+                                                <circle class="progress-ring__circle-bg" stroke="#1f2937" stroke-width="2" fill="transparent" r="10" cx="12" cy="12"/>
+                                                <circle id="progress-ring-circle" class="progress-ring__circle" stroke="#00f2fe" stroke-width="2" fill="transparent" r="10" cx="12" cy="12"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button id="tweet-btn" class="btn btn-tweet">
+                                    <i class="fa-brands fa-x-twitter"></i>
+                                    <span>Post to X / Twitter</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+        
+        <footer class="app-footer">
+            <p>BigQuery Release Notes Dashboard &copy; 2026. Data sourced from GCP Feeds.</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
