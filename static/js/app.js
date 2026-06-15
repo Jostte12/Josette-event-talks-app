@@ -160,6 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const icon = copyBtn.querySelector('i');
                     icon.className = 'fa-solid fa-check';
                     copyBtn.style.color = 'var(--accent-green)';
+                    showToast("Release note copied to clipboard!");
                     setTimeout(() => {
                         icon.className = 'fa-regular fa-copy';
                         copyBtn.style.color = '';
@@ -213,6 +214,28 @@ document.addEventListener('DOMContentLoaded', () => {
         
         tweetTextarea.value = `${prefix}${draftText} ${link}`;
         updateCharCount();
+    }
+
+    // Utility: Show Toast Notification
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        
+        const icon = type === 'success' ? 'fa-circle-check' : 'fa-circle-info';
+        toast.innerHTML = `
+            <i class="fa-solid ${icon}"></i>
+            <span>${message}</span>
+        `;
+        
+        container.appendChild(toast);
+        
+        // Remove after animation completes (3000ms)
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
     }
 
     // Update Character Count
@@ -276,6 +299,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        
+        showToast("CSV exported successfully!");
     }
 
     // Handle Tweet button click
@@ -322,6 +347,8 @@ document.addEventListener('DOMContentLoaded', () => {
             icon.className = 'fa-solid fa-moon';
             themeToggle.title = 'Switch to Light Mode';
         }
+        
+        showToast(`Theme changed to ${newTheme === 'light' ? 'Light' : 'Dark'} Mode`, 'info');
     });
 
     // Initial Load
