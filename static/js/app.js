@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
     const refreshBtn = document.getElementById('refresh-btn');
     const exportBtn = document.getElementById('export-btn');
+    const themeToggle = document.getElementById('theme-toggle');
     const retryBtn = document.getElementById('retry-btn');
     const spinner = document.getElementById('spinner');
     const searchInput = document.getElementById('search-input');
@@ -305,6 +306,23 @@ document.addEventListener('DOMContentLoaded', () => {
     retryBtn.addEventListener('click', fetchReleases);
     exportBtn.addEventListener('click', exportToCSV);
     tweetTextarea.addEventListener('input', updateCharCount);
+
+    // Theme Switcher Logic
+    themeToggle.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        
+        // Update toggle icon
+        const icon = themeToggle.querySelector('i');
+        if (newTheme === 'light') {
+            icon.className = 'fa-solid fa-sun';
+            themeToggle.title = 'Switch to Dark Mode';
+        } else {
+            icon.className = 'fa-solid fa-moon';
+            themeToggle.title = 'Switch to Light Mode';
+        }
+    });
 
     // Initial Load
     fetchReleases();

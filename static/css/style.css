@@ -26,6 +26,35 @@
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+[data-theme="light"] {
+    --bg-dark: #f8fafc;
+    --bg-card: rgba(255, 255, 255, 0.75);
+    --bg-card-hover: rgba(255, 255, 255, 0.9);
+    --border-color: rgba(0, 0, 0, 0.08);
+    --border-active: rgba(59, 130, 246, 0.5);
+    
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    
+    --gradient-glow: linear-gradient(135deg, rgba(59, 130, 246, 0.06) 0%, rgba(0, 242, 254, 0.06) 100%);
+}
+
+[data-theme="light"] .logo-area h1 {
+    background: linear-gradient(180deg, #0f172a 0%, #334155 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+[data-theme="light"] .btn-tweet {
+    background: #0f172a;
+    color: #ffffff;
+}
+
+[data-theme="light"] .btn-tweet:hover {
+    background: #1e293b;
+}
+
 * {
     margin: 0;
     padding: 0;
