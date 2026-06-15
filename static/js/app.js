@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // DOM Elements
     const refreshBtn = document.getElementById('refresh-btn');
+    const exportBtn = document.getElementById('export-btn');
     const retryBtn = document.getElementById('retry-btn');
     const spinner = document.getElementById('spinner');
     const searchInput = document.getElementById('search-input');
@@ -134,16 +135,36 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="type-tag ${typeClass}">${update.type}</span>
                         <span class="card-date">${update.date}</span>
                     </div>
-                    ${update.link ? `
-                        <a href="${update.link}" target="_blank" class="external-link" title="Open official notes" onclick="event.stopPropagation();">
-                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                        </a>
-                    ` : ''}
+                    <div class="card-actions-group">
+                        <button class="card-action-btn copy-btn" title="Copy to Clipboard">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                        ${update.link ? `
+                            <a href="${update.link}" target="_blank" class="external-link" title="Open official notes" onclick="event.stopPropagation();">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </a>
+                        ` : ''}
+                    </div>
                 </div>
                 <div class="card-content">
                     ${update.html}
                 </div>
             `;
+
+            // Copy to Clipboard Listener
+            const copyBtn = card.querySelector('.copy-btn');
+            copyBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                navigator.clipboard.writeText(update.text).then(() => {
+                    const icon = copyBtn.querySelector('i');
+                    icon.className = 'fa-solid fa-check';
+                    copyBtn.style.color = 'var(--accent-green)';
+                    setTimeout(() => {
+                        icon.className = 'fa-regular fa-copy';
+                        copyBtn.style.color = '';
+                    }, 2000);
+                });
+            });
 
             card.addEventListener('click', () => selectCard(update, card));
             releasesList.appendChild(card);
@@ -228,6 +249,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Export currently filtered releases to CSV
+    function exportToCSV() {
+        if (filteredUpdates.length === 0) return;
+        
+        const headers = ["Date", "Type", "Description", "Link"];
+        const rows = filteredUpdates.map(update => [
+            update.date,
+            update.type,
+            update.text,
+            update.link
+        ]);
+        
+        const csvContent = [
+            headers.join(","),
+            ...rows.map(row => row.map(val => `"${(val || '').replace(/"/g, '""')}"`).join(","))
+        ].join("\n");
+        
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", "bigquery_release_notes.csv");
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
     // Handle Tweet button click
     tweetBtn.addEventListener('click', () => {
         const text = encodeURIComponent(tweetTextarea.value);
@@ -254,6 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event listener for Refresh
     refreshBtn.addEventListener('click', fetchReleases);
     retryBtn.addEventListener('click', fetchReleases);
+    exportBtn.addEventListener('click', exportToCSV);
     tweetTextarea.addEventListener('input', updateCharCount);
 
     // Initial Load

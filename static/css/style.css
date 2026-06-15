@@ -356,13 +356,26 @@ body {
     color: var(--text-secondary);
 }
 
-.external-link {
-    color: var(--text-muted);
-    transition: var(--transition-smooth);
-    font-size: 0.9rem;
+.card-actions-group {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
 }
 
-.external-link:hover {
+.card-action-btn, .external-link {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    font-size: 0.9rem;
+    padding: 0.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-action-btn:hover, .external-link:hover {
     color: var(--accent-cyan);
 }
 
