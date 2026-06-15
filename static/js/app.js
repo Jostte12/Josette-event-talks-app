@@ -5,6 +5,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedUpdate = null;
     let currentFilter = 'all';
     let searchQuery = '';
+    const readUpdates = new Set(JSON.parse(localStorage.getItem('read_updates') || '[]'));
+
+    function getUpdateKey(update) {
+        return `${update.date}_${update.type}_${update.text.substring(0, 30)}`;
+    }
 
     // DOM Elements
     const refreshBtn = document.getElementById('refresh-btn');
@@ -120,8 +125,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderReleases() {
         releasesList.innerHTML = '';
         filteredUpdates.forEach((update, index) => {
+            const key = getUpdateKey(update);
+            const isRead = readUpdates.has(key);
+            
             const card = document.createElement('div');
-            card.className = `release-card card ${selectedUpdate && selectedUpdate.text === update.text ? 'selected' : ''}`;
+            card.className = `release-card card ${selectedUpdate && selectedUpdate.text === update.text ? 'selected' : ''} ${isRead ? 'read' : ''}`;
             
             // Get Category Badge Style
             const typeLower = update.type.toLowerCase();
@@ -135,6 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="card-meta">
                         <span class="type-tag ${typeClass}">${update.type}</span>
                         <span class="card-date">${update.date}</span>
+                        ${isRead ? '<span class="read-badge" title="You have viewed this update"><i class="fa-solid fa-check-double"></i> Viewed</span>' : ''}
                     </div>
                     <div class="card-actions-group">
                         <button class="card-action-btn copy-btn" title="Copy to Clipboard">
@@ -181,6 +190,24 @@ document.addEventListener('DOMContentLoaded', () => {
         // Select new
         selectedUpdate = update;
         cardElement.classList.add('selected');
+
+        // Mark as Viewed
+        const key = getUpdateKey(update);
+        if (!readUpdates.has(key)) {
+            readUpdates.add(key);
+            localStorage.setItem('read_updates', JSON.stringify([...readUpdates]));
+            cardElement.classList.add('read');
+            
+            // Render Viewed badge immediately
+            const meta = cardElement.querySelector('.card-meta');
+            if (meta && !meta.querySelector('.read-badge')) {
+                const badge = document.createElement('span');
+                badge.className = 'read-badge';
+                badge.title = 'You have viewed this update';
+                badge.innerHTML = '<i class="fa-solid fa-check-double"></i> Viewed';
+                meta.appendChild(badge);
+            }
+        }
 
         // Show composer
         composerPrompt.classList.add('hidden');
